@@ -1,3 +1,4 @@
+
 /***************************************************************************************************
 FILENAME: 006-AdventureWorks FROM - Using PIVOT and UNPIVOT Collection
 ***************************************************************************************************/
@@ -6,13 +7,15 @@ NOTES: AdventureWorks FROM - Using PIVOT and UNPIVOT Collection
 
 https://docs.microsoft.com/en-us/sql/t-sql/queries/from-using-pivot-and-unpivot?view=sql-server-2017
 ***************************************************************************************************/
+
 -- Basic PIVOT Example
-USE AdventureWorks2016 ;  
-GO  
+USE AdventureWorks2016;  
+GO
 
 -- Basic group by
-SELECT DaysToManufacture, AVG(StandardCost) AS AverageCost   
-FROM Production.Product  
+SELECT DaysToManufacture
+     , AVG(StandardCost) AS AverageCost
+FROM   Production.Product
 GROUP BY DaysToManufacture;
 
 /***************************************************************************************************
@@ -26,16 +29,22 @@ DaysToManufacture AverageCost
 ***************************************************************************************************/
 
 -- Pivot table with one row and five columns  
-SELECT 'AverageCost' AS Cost_Sorted_By_Production_Days,   
-[0], [1], [2], [3], [4]  
-FROM  
-(SELECT DaysToManufacture, StandardCost   
-    FROM Production.Product) AS SourceTable  
-PIVOT  
-(  
-AVG(StandardCost)  
-FOR DaysToManufacture IN ([0], [1], [2], [3], [4])  
-) AS PivotTable;
+SELECT 'AverageCost' AS Cost_Sorted_By_Production_Days
+     , [0]
+     , [1]
+     , [2]
+     , [3]
+     , [4]
+FROM
+     (
+       SELECT DaysToManufacture
+            , StandardCost
+       FROM   Production.Product
+     ) AS SourceTable PIVOT(AVG(StandardCost) FOR DaysToManufacture IN([0]
+                                                                     , [1]
+                                                                     , [2]
+                                                                     , [3]
+                                                                     , [4])) AS PivotTable;
 
 /***************************************************************************************************
 Results:
@@ -47,18 +56,25 @@ AverageCost                    5.0885      223.88      359.1082    NULL        9
 -- Complex PIVOT Example
 USE AdventureWorks2016;  
 GO  
-SELECT VendorID, [250] AS Emp1, [251] AS Emp2, [256] AS Emp3, [257] AS Emp4, [260] AS Emp5  
-FROM   
--- base table returns 4012 rows
-(SELECT PurchaseOrderID, EmployeeID, VendorID  
-FROM Purchasing.PurchaseOrderHeader) p  
-PIVOT  
-(  
--- get counts for only FIVE specif EmployeeID's
-COUNT (PurchaseOrderID)  
-FOR EmployeeID IN  
-( [250], [251], [256], [257], [260] )  
-) AS pvt  
+SELECT VendorID
+     , [250] AS Emp1
+     , [251] AS Emp2
+     , [256] AS Emp3
+     , [257] AS Emp4
+     , [260] AS Emp5
+FROM -- base table returns 4012 rows
+     (
+       SELECT PurchaseOrderID
+            , EmployeeID
+            , VendorID
+       FROM   Purchasing.PurchaseOrderHeader
+     ) AS p PIVOT(  
+     -- get counts for only FIVE specif EmployeeID's
+     COUNT(PurchaseOrderID) FOR EmployeeID IN([250]
+                                            , [251]
+                                            , [256]
+                                            , [257]
+                                            , [260])) AS pvt
 ORDER BY pvt.VendorID;
 
 /***************************************************************************************************
@@ -74,28 +90,89 @@ VendorID    Emp1        Emp2        Emp3        Emp4        Emp5
 
 -- UNPIVOT Example
 -- Create the table and insert values as portrayed in the previous example.  
-CREATE TABLE pvt (VendorID int, Emp1 int, Emp2 int,  
-    Emp3 int, Emp4 int, Emp5 int);  
+CREATE TABLE pvt
+(VendorID INT
+, Emp1     INT
+, Emp2     INT
+, Emp3     INT
+, Emp4     INT
+, Emp5     INT
+);  
 GO  
-INSERT INTO pvt VALUES (1,4,3,5,4,4);  
-INSERT INTO pvt VALUES (2,4,1,5,5,5);  
-INSERT INTO pvt VALUES (3,4,3,5,4,4);  
-INSERT INTO pvt VALUES (4,4,2,5,5,4);  
-INSERT INTO pvt VALUES (5,5,1,5,5,5);  
-GO  
+INSERT INTO pvt
+VALUES
+(
+       1
+     , 4
+     , 3
+     , 5
+     , 4
+     , 4
+);  
+INSERT INTO pvt
+VALUES
+(
+       2
+     , 4
+     , 1
+     , 5
+     , 5
+     , 5
+);  
+INSERT INTO pvt
+VALUES
+(
+       3
+     , 4
+     , 3
+     , 5
+     , 4
+     , 4
+);  
+INSERT INTO pvt
+VALUES
+(
+       4
+     , 4
+     , 2
+     , 5
+     , 5
+     , 4
+);  
+INSERT INTO pvt
+VALUES
+(
+       5
+     , 5
+     , 1
+     , 5
+     , 5
+     , 5
+);  
+GO
 
 -- Display original data
-Select * from pvt;
+SELECT *
+FROM   pvt;
 
 -- Unpivot the table.  
-SELECT VendorID, Employee, Orders  
-FROM   
-   (SELECT VendorID, Emp1, Emp2, Emp3, Emp4, Emp5  
-   FROM pvt) p  
-UNPIVOT  
-   (Orders FOR Employee IN   
-      (Emp1, Emp2, Emp3, Emp4, Emp5)  
-)AS unpvt;  
+SELECT VendorID
+     , Employee
+     , Orders
+FROM
+     (
+       SELECT VendorID
+            , Emp1
+            , Emp2
+            , Emp3
+            , Emp4
+            , Emp5
+       FROM   pvt
+     ) AS p UNPIVOT(Orders FOR Employee IN(Emp1
+                                         , Emp2
+                                         , Emp3
+                                         , Emp4
+                                         , Emp5)) AS unpvt;  
 GO
 
 /***************************************************************************************************
@@ -114,10 +191,6 @@ VendorID    Employee    Orders
 2            Emp5       5
 ...
 ***************************************************************************************************/
-
-
-
 /***************************************************************************************************
 NOTES:
 ***************************************************************************************************/
-

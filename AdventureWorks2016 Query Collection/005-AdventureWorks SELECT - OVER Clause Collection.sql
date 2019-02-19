@@ -1,3 +1,4 @@
+
 /***************************************************************************************************
 FILENAME: 005-AdventureWorks SELECT - OVER Clause Collection
 ***************************************************************************************************/
@@ -6,20 +7,23 @@ NOTES: AdventureWorks SELECT - ORDER BY Collection
 
 https://docs.microsoft.com/en-us/sql/t-sql/queries/select-over-clause-transact-sql?view=sql-server-2017
 ***************************************************************************************************/
+
 -- Using the OVER clause with the ROW_NUMBER function
 USE AdventureWorks2016;  
 GO  
-SELECT ROW_NUMBER() OVER(PARTITION BY PostalCode ORDER BY SalesYTD DESC) AS "Row Number",   
-    p.LastName, s.SalesYTD, a.PostalCode  
-FROM Sales.SalesPerson AS s   
-    INNER JOIN Person.Person AS p   
-        ON s.BusinessEntityID = p.BusinessEntityID  
-    INNER JOIN Person.Address AS a   
-        ON a.AddressID = p.BusinessEntityID  
-WHERE TerritoryID IS NOT NULL   
-    AND SalesYTD <> 0  
+SELECT ROW_NUMBER() OVER(PARTITION BY PostalCode
+       ORDER BY SalesYTD DESC) AS "Row Number"
+     , p.LastName
+     , s.SalesYTD
+     , a.PostalCode
+FROM   Sales.SalesPerson AS s
+       INNER JOIN Person.Person AS p ON s.BusinessEntityID = p.BusinessEntityID
+       INNER JOIN Person.Address AS a ON a.AddressID = p.BusinessEntityID
+WHERE  TerritoryID IS NOT NULL
+       AND SalesYTD <> 0
 ORDER BY PostalCode;  
 GO
+
 /***************************************************************************************************
 Results:
 Row Number      LastName                SalesYTD              PostalCode 
@@ -43,15 +47,22 @@ Row Number      LastName                SalesYTD              PostalCode
 -- Using the OVER clause with aggregate functions
 USE AdventureWorks2016;  
 GO  
-SELECT SalesOrderID, ProductID, OrderQty  
-    ,SUM(OrderQty) OVER(PARTITION BY SalesOrderID) AS Total  
-    ,AVG(OrderQty) OVER(PARTITION BY SalesOrderID) AS "Avg"  
-    ,COUNT(OrderQty) OVER(PARTITION BY SalesOrderID) AS "Count"  
-    ,MIN(OrderQty) OVER(PARTITION BY SalesOrderID) AS "Min"  
-    ,MAX(OrderQty) OVER(PARTITION BY SalesOrderID) AS "Max"  
-FROM Sales.SalesOrderDetail   
-WHERE SalesOrderID IN(43659,43664);  
+SELECT SalesOrderID
+     , ProductID
+     , OrderQty
+     , SUM(OrderQty) OVER(PARTITION BY SalesOrderID) AS Total
+     , AVG(OrderQty) OVER(PARTITION BY SalesOrderID) AS "Avg"
+     , COUNT(OrderQty) OVER(PARTITION BY SalesOrderID) AS "Count"
+     , MIN(OrderQty) OVER(PARTITION BY SalesOrderID) AS "Min"
+     , MAX(OrderQty) OVER(PARTITION BY SalesOrderID) AS "Max"
+FROM   Sales.SalesOrderDetail
+WHERE  SalesOrderID IN
+                      (
+                       43659
+                     , 43664
+                      );  
 GO
+
 /***************************************************************************************************
 Results:
 SalesOrderID ProductID   OrderQty Total       Avg         Count       Min    Max  
@@ -80,12 +91,17 @@ SalesOrderID ProductID   OrderQty Total       Avg         Count       Min    Max
 
 USE AdventureWorks2016;  
 GO  
-SELECT SalesOrderID, ProductID, OrderQty  
-    ,SUM(OrderQty) OVER(PARTITION BY SalesOrderID) AS Total  
-    ,CAST(1. * OrderQty / SUM(OrderQty) OVER(PARTITION BY SalesOrderID)   
-        *100 AS DECIMAL(5,2))AS "Percent by ProductID"  
-FROM Sales.SalesOrderDetail   
-WHERE SalesOrderID IN(43659,43664);  
+SELECT SalesOrderID
+     , ProductID
+     , OrderQty
+     , SUM(OrderQty) OVER(PARTITION BY SalesOrderID) AS Total
+     , CAST(1. * OrderQty / SUM(OrderQty) OVER(PARTITION BY SalesOrderID) * 100 AS DECIMAL(5, 2)) AS "Percent by ProductID"
+FROM   Sales.SalesOrderDetail
+WHERE  SalesOrderID IN
+                      (
+                       43659
+                     , 43664
+                      );  
 GO
 
 /***************************************************************************************************
@@ -119,18 +135,19 @@ SalesOrderID ProductID   OrderQty Total       Percent by ProductID
 -- Producing a moving average and cumulative total
 USE AdventureWorks2016;  
 GO  
-SELECT BusinessEntityID, TerritoryID   
-   ,DATEPART(yy,ModifiedDate) AS SalesYear  
-   ,CONVERT(varchar(20),SalesYTD,1) AS  SalesYTD  
-   ,CONVERT(varchar(20),AVG(SalesYTD) OVER (PARTITION BY TerritoryID   
-                                            ORDER BY DATEPART(yy,ModifiedDate)   
-                                           ),1) AS MovingAvg  
-   ,CONVERT(varchar(20),SUM(SalesYTD) OVER (PARTITION BY TerritoryID   
-                                            ORDER BY DATEPART(yy,ModifiedDate)   
-                                            ),1) AS CumulativeTotal  
-FROM Sales.SalesPerson  
-WHERE TerritoryID IS NULL OR TerritoryID < 5  
-ORDER BY TerritoryID,SalesYear;
+SELECT BusinessEntityID
+     , TerritoryID
+     , DATEPART(yy, ModifiedDate) AS SalesYear
+     , CONVERT(VARCHAR(20), SalesYTD, 1) AS SalesYTD
+     , CONVERT(VARCHAR(20), AVG(SalesYTD) OVER(PARTITION BY TerritoryID
+       ORDER BY DATEPART(yy, ModifiedDate)), 1) AS MovingAvg
+     , CONVERT(VARCHAR(20), SUM(SalesYTD) OVER(PARTITION BY TerritoryID
+       ORDER BY DATEPART(yy, ModifiedDate)), 1) AS CumulativeTotal
+FROM   Sales.SalesPerson
+WHERE  TerritoryID IS NULL
+       OR TerritoryID < 5
+ORDER BY TerritoryID
+       , SalesYear;
 
 /***************************************************************************************************
 Results:
@@ -150,15 +167,17 @@ BusinessEntityID TerritoryID SalesYear   SalesYTD             MovingAvg         
 (10 row(s) affected)
 ***************************************************************************************************/
 
-SELECT BusinessEntityID, TerritoryID   
-   ,DATEPART(yy,ModifiedDate) AS SalesYear  
-   ,CONVERT(varchar(20),SalesYTD,1) AS  SalesYTD  
-   ,CONVERT(varchar(20),AVG(SalesYTD) OVER (ORDER BY DATEPART(yy,ModifiedDate)   
-                                            ),1) AS MovingAvg  
-   ,CONVERT(varchar(20),SUM(SalesYTD) OVER (ORDER BY DATEPART(yy,ModifiedDate)   
-                                            ),1) AS CumulativeTotal  
-FROM Sales.SalesPerson  
-WHERE TerritoryID IS NULL OR TerritoryID < 5  
+SELECT BusinessEntityID
+     , TerritoryID
+     , DATEPART(yy, ModifiedDate) AS SalesYear
+     , CONVERT(VARCHAR(20), SalesYTD, 1) AS SalesYTD
+     , CONVERT(VARCHAR(20), AVG(SalesYTD) OVER(
+       ORDER BY DATEPART(yy, ModifiedDate)), 1) AS MovingAvg
+     , CONVERT(VARCHAR(20), SUM(SalesYTD) OVER(
+       ORDER BY DATEPART(yy, ModifiedDate)), 1) AS CumulativeTotal
+FROM   Sales.SalesPerson
+WHERE  TerritoryID IS NULL
+       OR TerritoryID < 5
 ORDER BY SalesYear;
 
 /***************************************************************************************************
@@ -179,14 +198,15 @@ BusinessEntityID TerritoryID SalesYear   SalesYTD             MovingAvg         
 ***************************************************************************************************/
 
 -- Specifying the ROWS clause
-SELECT BusinessEntityID, TerritoryID   
-    ,CONVERT(varchar(20),SalesYTD,1) AS  SalesYTD  
-    ,DATEPART(yy,ModifiedDate) AS SalesYear  
-    ,CONVERT(varchar(20),SUM(SalesYTD) OVER (PARTITION BY TerritoryID   
-                                             ORDER BY DATEPART(yy,ModifiedDate)   
-                                             ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING ),1) AS CumulativeTotal  
-FROM Sales.SalesPerson  
-WHERE TerritoryID IS NULL OR TerritoryID < 5;
+SELECT BusinessEntityID
+     , TerritoryID
+     , CONVERT(VARCHAR(20), SalesYTD, 1) AS SalesYTD
+     , DATEPART(yy, ModifiedDate) AS SalesYear
+     , CONVERT(VARCHAR(20), SUM(SalesYTD) OVER(PARTITION BY TerritoryID
+       ORDER BY DATEPART(yy, ModifiedDate) ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING), 1) AS CumulativeTotal
+FROM   Sales.SalesPerson
+WHERE  TerritoryID IS NULL
+       OR TerritoryID < 5;
 
 /***************************************************************************************************
 Results:
@@ -204,14 +224,16 @@ BusinessEntityID TerritoryID SalesYTD             SalesYear   CumulativeTotal
 281              4           2,458,535.62         2005        2,458,535.62
 ***************************************************************************************************/
 
-SELECT BusinessEntityID, TerritoryID   
-    ,CONVERT(varchar(20),SalesYTD,1) AS  SalesYTD  
-    ,DATEPART(yy,ModifiedDate) AS SalesYear  
-    ,CONVERT(varchar(20),SUM(SalesYTD) OVER (PARTITION BY TerritoryID   
-                                             ORDER BY DATEPART(yy,ModifiedDate)   
-                                             ROWS UNBOUNDED PRECEDING),1) AS CumulativeTotal  
-FROM Sales.SalesPerson  
-WHERE TerritoryID IS NULL OR TerritoryID < 5;
+SELECT BusinessEntityID
+     , TerritoryID
+     , CONVERT(VARCHAR(20), SalesYTD, 1) AS SalesYTD
+     , DATEPART(yy, ModifiedDate) AS SalesYear
+     , CONVERT(VARCHAR(20), SUM(SalesYTD) OVER(PARTITION BY TerritoryID
+       ORDER BY DATEPART(yy, ModifiedDate) ROWS UNBOUNDED PRECEDING), 1) AS CumulativeTotal
+FROM   Sales.SalesPerson
+WHERE  TerritoryID IS NULL
+       OR TerritoryID < 5;
+
 /***************************************************************************************************
 Results:
 BusinessEntityID TerritoryID SalesYTD             SalesYear   CumulativeTotal  
@@ -227,10 +249,6 @@ BusinessEntityID TerritoryID SalesYTD             SalesYear   CumulativeTotal
 276              4           4,251,368.55         2005        4,251,368.55  
 281              4           2,458,535.62         2005        6,709,904.17
 ***************************************************************************************************/
-
-
-
 /***************************************************************************************************
 NOTES:
 ***************************************************************************************************/
-
