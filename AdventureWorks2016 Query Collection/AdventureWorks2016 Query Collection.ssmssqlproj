@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<SqlWorkbenchSqlProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="AdventureWorks2016 Query Collection">
+  <Items>
+    <LogicalFolder Name="Connections" Type="2" Sorted="true">
+      <Items />
+    </LogicalFolder>
+    <LogicalFolder Name="Queries" Type="0" Sorted="true">
+      <Items>
+        <FileNode Name="001-AdventureWorks 2016 SELECT Examples Collection.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>001-AdventureWorks 2016 SELECT Examples Collection.sql</FullPath>
+        </FileNode>
+        <FileNode Name="002-AdventureWorks 2016 SELECT - GROUP BY Collection.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>002-AdventureWorks 2016 SELECT - GROUP BY Collection.sql</FullPath>
+        </FileNode>
+        <FileNode Name="003-AdventureWorks SELECT - Other Features Collection.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>003-AdventureWorks SELECT - Other Features Collection.sql</FullPath>
+        </FileNode>
+        <FileNode Name="004-AdventureWorks SELECT - ORDER BY Collection.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>004-AdventureWorks SELECT - ORDER BY Collection.sql</FullPath>
+        </FileNode>
+        <FileNode Name="005-AdventureWorks SELECT - OVER Clause Collection.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>005-AdventureWorks SELECT - OVER Clause Collection.sql</FullPath>
+        </FileNode>
+        <FileNode Name="006-AdventureWorks FROM - Using PIVOT and UNPIVOT Collection.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>006-AdventureWorks FROM - Using PIVOT and UNPIVOT Collection.sql</FullPath>
+        </FileNode>
+      </Items>
+    </LogicalFolder>
+    <LogicalFolder Name="Miscellaneous" Type="3" Sorted="true">
+      <Items />
+    </LogicalFolder>
+  </Items>
+</SqlWorkbenchSqlProject>
